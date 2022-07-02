@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val month = myCalendar.get(Calendar.MONTH)
         val day = myCalendar.get(Calendar.DAY_OF_MONTH)
 
-        DatePickerDialog(
+        val dpd = DatePickerDialog(
             this,
             { view, selectedYear, selectedMonth, selectedDay ->
 
@@ -67,7 +67,9 @@ class MainActivity : AppCompatActivity() {
             year,
             month,
             day
-        ).show()
+        )
+        dpd.datePicker.setMaxDate(myCalendar.timeInMillis)
+        dpd.show()
 
 
     }
