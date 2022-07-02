@@ -33,5 +33,17 @@
         android:textAlignment="center"
         android:textSize="24sp"
         android:text="" />
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:text="You've been lived for" />
+    <TextView
+        android:id="@+id/textHours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        android:text="00" />
 </LinearLayout>
