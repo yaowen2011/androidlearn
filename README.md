@@ -1,2 +1,2 @@
 # androidlearn
-学习安卓开发
+Managing those demos by using different branches
