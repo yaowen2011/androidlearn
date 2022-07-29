@@ -1,13 +1,23 @@
 package com.example.demo001
 
+import android.graphics.Color
+import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 
-class QuizQuestionActivity : AppCompatActivity() {
+class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
+
+    private var mCurrentPosition: Int = 0
+    private var mQuestionsList: ArrayList<Question>? = null
+    private var mSelectedOptionPosition: Int = 0
+
     private var progressBar: ProgressBar? = null
     private var tvProgress: TextView? = null
     private var tvQuestion: TextView? = null
@@ -16,6 +26,7 @@ class QuizQuestionActivity : AppCompatActivity() {
     private var tvOptionTwo: TextView? = null
     private var tvOptionThree: TextView? = null
     private var tvOptionFour: TextView? = null
+    private var btnSubmit: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,19 +42,26 @@ class QuizQuestionActivity : AppCompatActivity() {
         tvOptionTwo = findViewById(R.id.tv_option_two)
         tvOptionThree = findViewById(R.id.tv_option_three)
         tvOptionFour = findViewById(R.id.tv_option_four)
+        btnSubmit = findViewById(R.id.btn_submit)
 
+        // add listener
+        tvOptionOne?.setOnClickListener(this)
+        tvOptionTwo?.setOnClickListener(this)
+        tvOptionThree?.setOnClickListener(this)
+        tvOptionFour?.setOnClickListener(this)
+        btnSubmit?.setOnClickListener(this)
 
-        val questionsList = Constants.getQuestions()
+        mQuestionsList = Constants.getQuestions()
 
-        Log.i("QuestionsLIst size is ", "${questionsList.size}")
+        setQuestion()
+//        defaultOptionsView()
 
-        for(i in questionsList) {
-            Log.e("Questions", i.question)
-        }
+    }
 
-        var currentPosition = 0
-        val question: Question = questionsList[currentPosition]
-        progressBar?.progress = currentPosition + 1
+    private fun setQuestion() {
+
+        val question: Question = mQuestionsList!![mCurrentPosition]
+        progressBar?.progress = mCurrentPosition + 1
         tvProgress?.text = "${progressBar?.progress}/${progressBar?.max}"
         tvQuestion?.text = question.question
 
@@ -53,6 +71,74 @@ class QuizQuestionActivity : AppCompatActivity() {
         tvOptionThree?.text = question.optionThree
         tvOptionFour?.text = question.optionFour
 
+        if (mCurrentPosition == mQuestionsList!!.size - 1) {
+            btnSubmit?.text = "Finish"
+        } else {
+            btnSubmit?.text = "SUBMIT"
+        }
+    }
 
+    private fun defaultOptionsView() {
+        val options = ArrayList<TextView>()
+
+        tvOptionOne?.let {
+            options.add(0, it)
+        }
+        tvOptionTwo?.let {
+            options.add(1, it)
+        }
+        tvOptionThree?.let {
+            options.add(2, it)
+        }
+        tvOptionFour?.let {
+            options.add(3, it)
+        }
+
+        for (option in options) {
+//            option.setTextColor(Color.parseColor("#878700"))
+            option.typeface = Typeface.DEFAULT
+            option.background = ContextCompat.getDrawable(
+                this,
+                R.drawable.default_option_border_bg
+            )
+        }
+    }
+
+    private fun selectedOptionView(tv: TextView, selectedOptionNum: Int) {
+        defaultOptionsView()
+
+        mSelectedOptionPosition = selectedOptionNum
+
+        tv.setTextColor(Color.parseColor("#363A43"))
+        tv.setTypeface(tv.typeface, Typeface.BOLD)
+        tv.background = ContextCompat.getDrawable(this, R.drawable.selected_option_border_bg)
+    }
+
+    override fun onClick(view: View?) {
+        when(view?.id) {
+            R.id.tv_option_one -> {
+                tvOptionOne?.let {
+                    selectedOptionView(it, 1)
+                }
+            }
+            R.id.tv_option_two -> {
+                tvOptionTwo?.let {
+                    selectedOptionView(it, 2)
+                }
+            }
+            R.id.tv_option_three -> {
+                tvOptionThree?.let {
+                    selectedOptionView(it, 3)
+                }
+            }
+            R.id.tv_option_four -> {
+                tvOptionFour?.let {
+                    selectedOptionView(it, 4)
+                }
+            }
+            R.id.btn_submit-> {
+                // TODO "implement btn submit"
+            }
+        }
     }
 }
