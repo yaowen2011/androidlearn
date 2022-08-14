@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MaterialComponents.NoActionBar">
         <activity
+            android:name=".ResultActivity"
+            android:exported="true" />
+        <activity
             android:name=".QuizQuestionActivity"
             android:exported="true" />
         <activity

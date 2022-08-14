@@ -1,15 +1,13 @@
 package com.example.demo001
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.ContextCompat
 
 class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
@@ -17,6 +15,8 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
     private var mCurrentPosition: Int = 0
     private var mQuestionsList: ArrayList<Question>? = null
     private var mSelectedOptionPosition: Int = 0
+    private var mUserName: String? = null
+    private var mCorrectCount: Int = 0
 
     private var progressBar: ProgressBar? = null
     private var tvProgress: TextView? = null
@@ -31,6 +31,8 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz_question)
+
+        mUserName = intent.getStringExtra(Constants.USER_NAME)
 
         progressBar = findViewById(R.id.progressBar)
         tvProgress = findViewById(R.id.tv_progress)
@@ -60,6 +62,7 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun setQuestion() {
 
+        defaultOptionsView()
         val question: Question = mQuestionsList!![mCurrentPosition]
         progressBar?.progress = mCurrentPosition + 1
         tvProgress?.text = "${progressBar?.progress}/${progressBar?.max}"
@@ -114,6 +117,23 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
         tv.background = ContextCompat.getDrawable(this, R.drawable.selected_option_border_bg)
     }
 
+    private fun answerView(answer:Int, drawableView: Int) {
+        when(answer) {
+            1-> {
+                tvOptionOne?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+            2-> {
+                tvOptionTwo?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+            3-> {
+                tvOptionThree?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+            4-> {
+                tvOptionFour?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+        }
+    }
+
     override fun onClick(view: View?) {
         when(view?.id) {
             R.id.tv_option_one -> {
@@ -137,7 +157,41 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
             R.id.btn_submit-> {
-                // TODO "implement btn submit"
+                if(mSelectedOptionPosition ==0) {
+                    // do nothing and show next question
+                    mCurrentPosition++
+                    when {
+                        mCurrentPosition <= mQuestionsList!!.size-1 -> {
+                            setQuestion()
+                        }
+                        else -> {
+//                            Toast.makeText(this, "You made it to the end", Toast.LENGTH_LONG)
+//                                .show()
+                            val intent = Intent(this, ResultActivity::class.java)
+                            intent.putExtra(Constants.USER_NAME, mUserName)
+                            intent.putExtra(Constants.TOTAL_QUESTIONS, mQuestionsList?.size)
+                            intent.putExtra(Constants.CORRECT_QUESTIONS, mCorrectCount)
+                            startActivity(intent)
+                        }
+                    }
+                } else {
+                    val question = mQuestionsList?.get(mCurrentPosition)
+                    if (mSelectedOptionPosition == question?.correctAnswer) {
+                        answerView(mSelectedOptionPosition, R.drawable.correct_option_border_bg)
+                        mCorrectCount++
+                    } else {
+                        answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
+                        answerView(question!!.correctAnswer, R.drawable.correct_option_border_bg)
+                    }
+
+                    if(mCurrentPosition == mQuestionsList!!.size-1) {
+                        btnSubmit?.text = "FINISH"
+                    } else {
+                        btnSubmit?.text = "GO TO NEXT QUESTION"
+                    }
+
+                    mSelectedOptionPosition = 0
+                }
             }
         }
     }
